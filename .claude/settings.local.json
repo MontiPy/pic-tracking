@@ -1,0 +1,28 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "Bash(mkdir:*)",
+      "Bash(npm install:*)",
+      "Bash(npx prisma:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npm run:*)",
+      "Bash(rm:*)",
+      "Bash(find:*)",
+      "Bash(npm cache clean:*)",
+      "Bash(cmd //c:*)",
+      "Bash(cp -r temp-next/* .)",
+      "Bash(cp temp-next/.* .)",
+      "Bash(true)",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_snapshot"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
