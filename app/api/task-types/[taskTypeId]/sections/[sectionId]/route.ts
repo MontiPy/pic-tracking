@@ -9,14 +9,14 @@ import {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string; id: string }> }
+  { params }: { params: Promise<{ taskTypeId: string; sectionId: string }> }
 ) {
   try {
-    const { taskTypeId, id } = await params
+    const { taskTypeId, sectionId } = await params
 
     const section = await prisma.taskTypeSection.findUnique({
-      where: { 
-        id,
+      where: {
+        id: sectionId,
         taskTypeId
       },
       include: {
@@ -53,7 +53,7 @@ export async function GET(
 
     if (!section) {
       return NextResponse.json(
-        createNotFoundError('TaskTypeSection', id),
+        createNotFoundError('TaskTypeSection', sectionId),
         { status: 404 }
       )
     }
@@ -70,10 +70,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string; id: string }> }
+  { params }: { params: Promise<{ taskTypeId: string; sectionId: string }> }
 ) {
   try {
-    const { taskTypeId, id } = await params
+    const { taskTypeId, sectionId } = await params
     const body = await request.json()
 
     // Validate input
@@ -87,21 +87,21 @@ export async function PUT(
 
     // Check if section exists and belongs to the task type
     const existingSection = await prisma.taskTypeSection.findUnique({
-      where: { 
-        id,
+      where: {
+        id: sectionId,
         taskTypeId
       }
     })
 
     if (!existingSection) {
       return NextResponse.json(
-        createNotFoundError('TaskTypeSection', id),
+        createNotFoundError('TaskTypeSection', sectionId),
         { status: 404 }
       )
     }
 
     const updatedSection = await prisma.taskTypeSection.update({
-      where: { id },
+      where: { id: sectionId },
       data: validationResult.data,
       include: {
         tasks: {
@@ -153,15 +153,15 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string; id: string }> }
+  { params }: { params: Promise<{ taskTypeId: string; sectionId: string }> }
 ) {
   try {
-    const { taskTypeId, id } = await params
+    const { taskTypeId, sectionId } = await params
 
     // Check if section exists and belongs to the task type
     const existingSection = await prisma.taskTypeSection.findUnique({
-      where: { 
-        id,
+      where: {
+        id: sectionId,
         taskTypeId
       },
       include: {
@@ -173,7 +173,7 @@ export async function DELETE(
 
     if (!existingSection) {
       return NextResponse.json(
-        createNotFoundError('TaskTypeSection', id),
+        createNotFoundError('TaskTypeSection', sectionId),
         { status: 404 }
       )
     }
@@ -188,12 +188,12 @@ export async function DELETE(
 
     // Delete the section
     await prisma.taskTypeSection.delete({
-      where: { id }
+      where: { id: sectionId }
     })
 
     return NextResponse.json({ 
       message: 'Task type section deleted successfully',
-      deletedId: id 
+      deletedId: sectionId
     })
   } catch (error) {
     console.error('Error deleting task type section:', error)

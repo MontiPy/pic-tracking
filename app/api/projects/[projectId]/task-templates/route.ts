@@ -4,10 +4,10 @@ import { TaskSyncService } from '@/lib/task-sync'
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const { id } = await params
+    const { projectId } = await params
     const body = await request.json()
     const { taskTypeId, canonicalDue, description } = body as {
       taskTypeId?: string
@@ -21,7 +21,7 @@ export async function POST(
 
     // Validate project and task type
     const [project, taskType] = await Promise.all([
-      prisma.project.findUnique({ where: { id }, select: { id: true } }),
+      prisma.project.findUnique({ where: { id: projectId }, select: { id: true } }),
       prisma.taskType.findUnique({ where: { id: taskTypeId }, select: { id: true, name: true, category: true } })
     ])
 
@@ -33,7 +33,7 @@ export async function POST(
       // Create the template
       const template = await tx.taskTemplate.create({
         data: {
-          projectId: id,
+          projectId,
           taskTypeId,
           canonicalDue: new Date(canonicalDue),
           description: description || ''

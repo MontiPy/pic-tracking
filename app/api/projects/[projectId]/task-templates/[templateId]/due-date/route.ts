@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function PUT(
   request: Request,
-  { params }: { params: { id: string; templateId: string } }
+  { params }: { params: { projectId: string; templateId: string } }
 ) {
   try {
     const body = await request.json()
@@ -18,7 +18,7 @@ export async function PUT(
 
     // Ensure the template belongs to the provided project
     const template = await prisma.taskTemplate.findFirst({
-      where: { id: params.templateId, projectId: params.id },
+      where: { id: params.templateId, projectId: params.projectId },
       select: { id: true }
     })
 
