@@ -25,9 +25,17 @@
       "Bash(mv:*)",
       "mcp__playwright__browser_handle_dialog",
       "mcp__playwright__browser_console_messages",
-      "mcp__playwright__browser_select_option"
+      "mcp__playwright__browser_select_option",
+      "Bash(cp:*)",
+      "Bash(npm uninstall:*)",
+      "Bash(timeout 15s npm run dev)",
+      "Bash(npx ts-node:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [],
+    "additionalDirectories": [
+      "C:\\c\\Users\\v0409324\\Documents\\Sandbox_Local"
+    ]
   }
 }

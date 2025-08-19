@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { cache, CacheKeys, CacheTTL, CacheInvalidation } from '@/lib/cache'
-
-const prisma = new PrismaClient()
+import { createSupplierSchema } from '@/lib/validation'
 
 // Interface for supplier task statistics
 interface TaskStats {
@@ -116,7 +115,7 @@ export async function GET(request: Request) {
               }
             },
             supplierTaskInstances: {
-              where: { isApplied: true }, // Only include applied tasks
+              // include all; applied filtering handled in UI/stats
               select: {
                 id: true,
                 status: true,
@@ -125,6 +124,7 @@ export async function GET(request: Request) {
                 completedAt: true,
                 updatedAt: true,
                 isApplied: true,
+                responsibleParties: true,
                 projectMilestoneTask: {
                   select: {
                     id: true,
@@ -276,7 +276,11 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, contactInfo, supplierNumber, location, contacts } = body
+    const parsed = createSupplierSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 })
+    }
+    const { name, contactInfo, supplierNumber, location, contacts } = parsed.data
 
     if (!name) {
       return NextResponse.json(
@@ -287,16 +291,12 @@ export async function POST(request: Request) {
 
     // Validate contacts format if provided
     let contactsJson = null
-    if (contacts) {
+    if (contacts !== undefined) {
       try {
         contactsJson = typeof contacts === 'string' ? contacts : JSON.stringify(contacts)
-        // Validate it's valid JSON
-        JSON.parse(contactsJson)
-      } catch (error) {
-        return NextResponse.json(
-          { error: 'Invalid contacts format' },
-          { status: 400 }
-        )
+        JSON.parse(contactsJson as string)
+      } catch {
+        return NextResponse.json({ error: 'Invalid contacts format' }, { status: 400 })
       }
     }
 

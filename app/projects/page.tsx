@@ -33,6 +33,12 @@ export default function ProjectsPage() {
   const [editingProject, setEditingProject] = useState<Project | null>(null)
   const [showAddModal, setShowAddModal] = useState(false)
   const [saving, setSaving] = useState(false)
+  const [showBulkAttachModal, setShowBulkAttachModal] = useState(false)
+  const [bulkAttachProjectId, setBulkAttachProjectId] = useState<string | null>(null)
+  const [bulkItems, setBulkItems] = useState<Array<{ milestoneId: string; taskId: string; dueDate: string; isActive?: boolean; notes?: string }>>([
+    { milestoneId: '', taskId: '', dueDate: '' }
+  ])
+  const [bulkSaving, setBulkSaving] = useState(false)
 
   useEffect(() => {
     fetch('/api/projects')
@@ -111,6 +117,39 @@ export default function ProjectsPage() {
     setShowAddModal(false)
   }
 
+  const openBulkAttach = (projectId: string) => {
+    setBulkAttachProjectId(projectId)
+    setShowBulkAttachModal(true)
+  }
+
+  const handleBulkItemChange = (index: number, field: keyof (typeof bulkItems)[number], value: string | boolean) => {
+    setBulkItems(prev => prev.map((it, i) => i === index ? { ...it, [field]: value } as any : it))
+  }
+
+  const addBulkRow = () => setBulkItems(prev => [...prev, { milestoneId: '', taskId: '', dueDate: '' }])
+  const removeBulkRow = (index: number) => setBulkItems(prev => prev.filter((_, i) => i !== index))
+
+  const submitBulkAttach = async () => {
+    if (!bulkAttachProjectId) return
+    setBulkSaving(true)
+    try {
+      const response = await fetch(`/api/projects/${bulkAttachProjectId}/project-templates/bulk`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ items: bulkItems.filter(i => i.milestoneId && i.taskId && i.dueDate) })
+      })
+      if (!response.ok) throw new Error('Failed to attach templates')
+      // Optimistic close; consider refresh projects if needed
+      setShowBulkAttachModal(false)
+      setBulkItems([{ milestoneId: '', taskId: '', dueDate: '' }])
+    } catch (e) {
+      console.error(e)
+      alert('Bulk attach failed')
+    } finally {
+      setBulkSaving(false)
+    }
+  }
+
   return (
     <Layout>
       <div className="space-y-4">
@@ -125,13 +164,15 @@ export default function ProjectsPage() {
                 Manage projects and supplier assignments
               </p>
             </div>
-            <button 
-              onClick={() => setShowAddModal(true)}
-              className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700 transition-colors"
-            >
-              <Plus className="h-4 w-4" />
-              New Project
-            </button>
+            <div className="flex items-center gap-2">
+              <button 
+                onClick={() => setShowAddModal(true)}
+                className="flex items-center gap-1.5 bg-blue-600 text-white px-3 py-1.5 rounded text-sm hover:bg-blue-700 transition-colors"
+              >
+                <Plus className="h-4 w-4" />
+                New Project
+              </button>
+            </div>
           </div>
         </div>
 
@@ -282,9 +323,17 @@ export default function ProjectsPage() {
 
                 <div className="px-3 py-2 bg-gray-50 border-t">
                   <div className="flex items-center justify-between text-xs">
-                    <button className="text-blue-600 hover:text-blue-800 font-medium">
-                      Manage Suppliers
-                    </button>
+                    <div className="flex items-center gap-3">
+                      <button className="text-blue-600 hover:text-blue-800 font-medium">
+                        Manage Suppliers
+                      </button>
+                      <button
+                        onClick={() => openBulkAttach(project.id)}
+                        className="text-purple-600 hover:text-purple-800 font-medium"
+                      >
+                        Bulk Attach Tasks
+                      </button>
+                    </div>
                     <div className="flex items-center gap-3">
                       <button className="text-gray-600 hover:text-gray-800">
                         Tasks
@@ -341,6 +390,57 @@ export default function ProjectsPage() {
           onCancel={handleCancelEdit}
           isLoading={saving}
         />
+      </Modal>
+
+      {/* Bulk Attach Modal */}
+      <Modal
+        isOpen={showBulkAttachModal}
+        onClose={() => setShowBulkAttachModal(false)}
+        title="Bulk Attach Tasks to Project"
+      >
+        <div className="space-y-2">
+          <p className="text-xs text-gray-600">Add rows with Milestone ID, Task ID, and Due Date. Instances will be created for all assigned suppliers.</p>
+          <div className="space-y-2 max-h-80 overflow-y-auto">
+            {bulkItems.map((item, idx) => (
+              <div key={idx} className="grid grid-cols-12 gap-2 items-center">
+                <input
+                  className="col-span-4 border rounded px-2 py-1 text-sm"
+                  placeholder="Milestone ID"
+                  value={item.milestoneId}
+                  onChange={(e) => handleBulkItemChange(idx, 'milestoneId', e.target.value)}
+                />
+                <input
+                  className="col-span-4 border rounded px-2 py-1 text-sm"
+                  placeholder="Task ID"
+                  value={item.taskId}
+                  onChange={(e) => handleBulkItemChange(idx, 'taskId', e.target.value)}
+                />
+                <input
+                  type="date"
+                  className="col-span-3 border rounded px-2 py-1 text-sm"
+                  value={item.dueDate}
+                  onChange={(e) => handleBulkItemChange(idx, 'dueDate', e.target.value)}
+                />
+                <button
+                  className="col-span-1 text-xs text-red-600 hover:text-red-800"
+                  onClick={() => removeBulkRow(idx)}
+                >
+                  Remove
+                </button>
+              </div>
+            ))}
+          </div>
+          <div className="flex justify-between items-center">
+            <button className="text-sm text-blue-600 hover:text-blue-800" onClick={addBulkRow}>+ Add Row</button>
+            <button
+              onClick={submitBulkAttach}
+              disabled={bulkSaving}
+              className="bg-purple-600 text-white px-3 py-1.5 rounded text-sm hover:bg-purple-700 disabled:opacity-50"
+            >
+              {bulkSaving ? 'Attaching...' : 'Attach'}
+            </button>
+          </div>
+        </div>
       </Modal>
     </Layout>
   )

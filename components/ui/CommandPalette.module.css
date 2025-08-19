@@ -1,0 +1,432 @@
+/* Command Palette Styles */
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(4px);
+  z-index: 9999;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 20vh 20px 20px;
+  animation: fadeIn 0.15s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.container {
+  width: 100%;
+  max-width: 640px;
+  background: var(--color-neutral-0, #ffffff);
+  border-radius: 12px;
+  box-shadow: 
+    0 20px 25px -5px rgba(0, 0, 0, 0.1),
+    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  border: 1px solid var(--color-neutral-200, #e5e7eb);
+  overflow: hidden;
+  animation: slideIn 0.15s ease-out;
+  transform-origin: top center;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Header */
+.header {
+  display: flex;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--color-neutral-200, #e5e7eb);
+  background: var(--color-neutral-50, #f9fafb);
+}
+
+.searchIcon {
+  color: var(--color-neutral-400, #9ca3af);
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+
+.input {
+  flex: 1;
+  border: none;
+  outline: none;
+  font-size: 16px;
+  color: var(--color-neutral-900, #111827);
+  background: transparent;
+  placeholder-color: var(--color-neutral-400, #9ca3af);
+  font-weight: 500;
+}
+
+.input::placeholder {
+  color: var(--color-neutral-400, #9ca3af);
+}
+
+.shortcuts {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.shortcut {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 8px;
+  background: var(--color-neutral-100, #f3f4f6);
+  border: 1px solid var(--color-neutral-300, #d1d5db);
+  border-radius: 6px;
+  font-size: 12px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  color: var(--color-neutral-600, #4b5563);
+  font-weight: 500;
+}
+
+/* Results */
+.results {
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 8px 0;
+}
+
+.loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 40px 24px;
+  color: var(--color-neutral-600, #4b5563);
+  font-size: 14px;
+}
+
+.spinner {
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--color-neutral-200, #e5e7eb);
+  border-top: 2px solid var(--color-accent-500, #3b82f6);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 24px;
+  text-align: center;
+}
+
+.emptyIcon {
+  color: var(--color-neutral-300, #d1d5db);
+  margin-bottom: 12px;
+}
+
+.empty p {
+  margin: 0 0 4px;
+  color: var(--color-neutral-600, #4b5563);
+  font-weight: 500;
+}
+
+.emptySubtext {
+  color: var(--color-neutral-400, #9ca3af) !important;
+  font-size: 14px;
+  font-weight: normal !important;
+}
+
+/* Groups */
+.group {
+  margin-bottom: 8px;
+}
+
+.group:last-child {
+  margin-bottom: 0;
+}
+
+.groupHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 24px 4px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--color-neutral-500, #6b7280);
+}
+
+/* Commands */
+.command {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 24px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  border-radius: 0;
+}
+
+.command:hover {
+  background-color: var(--color-neutral-50, #f9fafb);
+}
+
+.command.selected {
+  background-color: var(--color-accent-50, #eff6ff);
+  border-left: 3px solid var(--color-accent-500, #3b82f6);
+  padding-left: 21px;
+}
+
+.command.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.command.disabled:hover {
+  background: none;
+}
+
+.commandIcon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--color-neutral-100, #f3f4f6);
+  border-radius: 8px;
+  color: var(--color-neutral-600, #4b5563);
+  flex-shrink: 0;
+}
+
+.command.selected .commandIcon {
+  background: var(--color-accent-100, #dbeafe);
+  color: var(--color-accent-600, #2563eb);
+}
+
+.commandContent {
+  flex: 1;
+  min-width: 0;
+}
+
+.commandTitle {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-neutral-900, #111827);
+  margin-bottom: 2px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commandSubtitle {
+  font-size: 12px;
+  color: var(--color-neutral-500, #6b7280);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.commandMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.commandShortcut {
+  padding: 4px 6px;
+  background: var(--color-neutral-100, #f3f4f6);
+  border: 1px solid var(--color-neutral-200, #e5e7eb);
+  border-radius: 4px;
+  font-size: 11px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  color: var(--color-neutral-600, #4b5563);
+  font-weight: 500;
+}
+
+.command.selected .commandShortcut {
+  background: var(--color-accent-100, #dbeafe);
+  border-color: var(--color-accent-200, #bfdbfe);
+  color: var(--color-accent-700, #1d4ed8);
+}
+
+.commandArrow {
+  color: var(--color-neutral-400, #9ca3af);
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.command:hover .commandArrow,
+.command.selected .commandArrow {
+  opacity: 1;
+}
+
+/* Footer */
+.footer {
+  border-top: 1px solid var(--color-neutral-200, #e5e7eb);
+  padding: 12px 24px;
+  background: var(--color-neutral-50, #f9fafb);
+}
+
+.footerHints {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  font-size: 12px;
+  color: var(--color-neutral-500, #6b7280);
+}
+
+.footerShortcut {
+  padding: 2px 6px;
+  background: var(--color-neutral-200, #e5e7eb);
+  border: 1px solid var(--color-neutral-300, #d1d5db);
+  border-radius: 4px;
+  font-size: 10px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  color: var(--color-neutral-600, #4b5563);
+  font-weight: 600;
+  margin-right: 4px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .overlay {
+    padding: 10vh 16px 16px;
+  }
+  
+  .container {
+    max-width: 100%;
+  }
+  
+  .header {
+    padding: 16px 20px;
+  }
+  
+  .input {
+    font-size: 16px; /* Prevent zoom on iOS */
+  }
+  
+  .results {
+    max-height: 50vh;
+  }
+  
+  .command {
+    padding: 10px 20px;
+  }
+  
+  .command.selected {
+    padding-left: 17px;
+  }
+  
+  .commandShortcut {
+    display: none; /* Hide shortcuts on mobile */
+  }
+  
+  .footerHints {
+    gap: 12px;
+    font-size: 11px;
+  }
+  
+  .groupHeader {
+    padding: 6px 20px 3px;
+  }
+}
+
+@media (max-width: 480px) {
+  .commandIcon {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .commandTitle {
+    font-size: 13px;
+  }
+  
+  .commandSubtitle {
+    font-size: 11px;
+  }
+  
+  .footerHints span:nth-child(n+3) {
+    display: none; /* Hide some hints on very small screens */
+  }
+}
+
+/* High Contrast Mode */
+@media (prefers-contrast: high) {
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: none;
+  }
+  
+  .container {
+    border: 2px solid ButtonText;
+    box-shadow: none;
+  }
+  
+  .command:hover {
+    background-color: Highlight;
+    color: HighlightText;
+  }
+  
+  .command.selected {
+    background-color: Highlight;
+    color: HighlightText;
+    border-left-color: HighlightText;
+  }
+  
+  .commandIcon {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 1px solid ButtonText;
+  }
+  
+  .command.selected .commandIcon {
+    background: HighlightText;
+    color: Highlight;
+  }
+}
+
+/* Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  .overlay,
+  .container,
+  .command,
+  .commandArrow {
+    animation: none;
+    transition: none;
+  }
+}
+
+/* Focus Visible for Keyboard Navigation */
+.command:focus-visible {
+  outline: 2px solid var(--color-accent-500, #3b82f6);
+  outline-offset: -2px;
+}
+
+.input:focus-visible {
+  outline: 2px solid var(--color-accent-500, #3b82f6);
+  outline-offset: 2px;
+}

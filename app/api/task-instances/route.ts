@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import { createLegacyTaskInstanceSchema } from '@/lib/validation'
 
 export async function GET(request: Request) {
   try {
@@ -68,16 +67,9 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { supplierProjectId, taskTemplateId, actualDue, status } = body as {
-      supplierProjectId?: string
-      taskTemplateId?: string
-      actualDue?: string
-      status?: string
-    }
-
-    if (!supplierProjectId || !taskTemplateId) {
-      return NextResponse.json({ error: 'supplierProjectId and taskTemplateId are required' }, { status: 400 })
-    }
+    const parsed = createLegacyTaskInstanceSchema.safeParse(body)
+    if (!parsed.success) return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 })
+    const { supplierProjectId, taskTemplateId, actualDue, status } = parsed.data
 
     // Default due date from template if not provided
     let due: Date | null = null

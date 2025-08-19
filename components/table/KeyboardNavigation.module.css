@@ -1,0 +1,328 @@
+/* Keyboard Navigation Styles */
+
+/* Focus indicators for keyboard navigation */
+.keyboardFocused {
+  position: relative;
+  background-color: var(--color-accent-bg, #f0f9ff);
+  border: 2px solid var(--color-accent-border, #3b82f6);
+  border-radius: 4px;
+}
+
+.keyboardFocused::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border: 2px solid var(--color-accent-border, #3b82f6);
+  border-radius: 6px;
+  pointer-events: none;
+}
+
+/* Enhanced focus ring for better visibility */
+.keyboardFocused:focus-visible {
+  outline: 2px solid var(--color-accent-strong, #1d4ed8);
+  outline-offset: 2px;
+}
+
+/* Focus management for table cells */
+.cell {
+  position: relative;
+  transition: all 0.15s ease;
+}
+
+.cell:focus {
+  background-color: var(--color-accent-bg, #f0f9ff);
+  outline: 2px solid var(--color-accent-border, #3b82f6);
+  outline-offset: -2px;
+  z-index: 1;
+}
+
+.cell:focus-visible {
+  outline: 2px solid var(--color-accent-strong, #1d4ed8);
+  outline-offset: -2px;
+}
+
+/* Row focus states */
+.row.keyboardFocused {
+  background-color: var(--color-accent-bg, #f0f9ff);
+}
+
+.row.keyboardFocused .cell {
+  background-color: transparent;
+}
+
+/* Editing state focus */
+.cellEditing {
+  background-color: var(--color-warning-bg, #fefce8);
+  border: 2px solid var(--color-warning-border, #fbbf24);
+  border-radius: 4px;
+}
+
+.cellEditing input,
+.cellEditing textarea,
+.cellEditing select {
+  border: none;
+  background: transparent;
+  outline: none;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  margin: 0;
+}
+
+/* Multi-select visual feedback */
+.cellSelected {
+  background-color: var(--color-selection-bg, #dbeafe);
+  border: 1px solid var(--color-selection-border, #93c5fd);
+}
+
+.cellSelected.keyboardFocused {
+  background-color: var(--color-selection-focused, #bfdbfe);
+  border: 2px solid var(--color-accent-border, #3b82f6);
+}
+
+/* Range selection indicators */
+.selectionRange {
+  background-color: var(--color-selection-range, #e0e7ff);
+  border: 1px dashed var(--color-selection-border, #93c5fd);
+}
+
+/* Skip link for accessibility */
+.skipLink {
+  position: absolute;
+  top: -40px;
+  left: 6px;
+  background: var(--color-neutral-950, #030712);
+  color: var(--color-neutral-50, #f9fafb);
+  padding: 8px;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 14px;
+  z-index: 1000;
+  transform: translateY(-100%);
+  transition: transform 0.3s;
+}
+
+.skipLink:focus {
+  transform: translateY(0%);
+}
+
+/* Keyboard shortcut hints */
+.shortcutHint {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: var(--color-neutral-800, #1f2937);
+  color: var(--color-neutral-100, #f3f4f6);
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 2px;
+  opacity: 0;
+  transition: opacity 0.2s;
+  pointer-events: none;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+}
+
+.cell:hover .shortcutHint,
+.cell:focus .shortcutHint {
+  opacity: 1;
+}
+
+/* Navigation mode indicators */
+.navigationMode {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  background: var(--color-neutral-900, #111827);
+  color: var(--color-neutral-100, #f3f4f6);
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s ease;
+}
+
+.navigationMode.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.navigationModeIndicator {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.navigationModeIcon {
+  width: 12px;
+  height: 12px;
+}
+
+/* Bulk selection indicators */
+.bulkSelectionMode .row {
+  cursor: pointer;
+}
+
+.bulkSelectionMode .row:hover {
+  background-color: var(--color-selection-hover, #f0f9ff);
+}
+
+.bulkSelectionMode .cell::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: var(--color-accent-border, #3b82f6);
+  opacity: 0;
+  transition: opacity 0.2s;
+}
+
+.bulkSelectionMode .row.selected .cell::before {
+  opacity: 1;
+}
+
+/* Status transition hints */
+.statusTransitionHints {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--color-neutral-900, #111827);
+  color: var(--color-neutral-100, #f3f4f6);
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-size: 12px;
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  z-index: 1000;
+  opacity: 0;
+  transform: translateX(-50%) translateY(10px);
+  transition: all 0.3s ease;
+  max-width: 90vw;
+  overflow-x: auto;
+}
+
+.statusTransitionHints.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+.statusHint {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+
+.statusHintKey {
+  background: var(--color-neutral-700, #374151);
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', monospace;
+  font-weight: bold;
+}
+
+.statusIndicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  margin-right: 4px;
+}
+
+.statusIndicator.notStarted {
+  background: var(--color-neutral-400, #9ca3af);
+  border: 1px solid var(--color-neutral-500, #6b7280);
+}
+
+.statusIndicator.inProgress {
+  background: linear-gradient(90deg, var(--color-blue-500, #3b82f6) 50%, transparent 50%);
+  border: 1px solid var(--color-blue-500, #3b82f6);
+}
+
+.statusIndicator.submitted {
+  background: var(--color-amber-500, #f59e0b);
+}
+
+.statusIndicator.approved {
+  background: var(--color-emerald-500, #10b981);
+}
+
+.statusIndicator.blocked {
+  background: var(--color-red-500, #ef4444);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  border-radius: 0;
+}
+
+/* Responsive adjustments for keyboard navigation */
+@media (max-width: 768px) {
+  .keyboardFocused {
+    border-width: 1px;
+  }
+  
+  .keyboardFocused::after {
+    border-width: 1px;
+    inset: -1px;
+  }
+  
+  .shortcutHint {
+    display: none;
+  }
+  
+  .navigationMode {
+    top: 10px;
+    right: 10px;
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+  
+  .statusTransitionHints {
+    bottom: 10px;
+    padding: 8px 12px;
+    font-size: 11px;
+    gap: 12px;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .keyboardFocused {
+    border-color: ButtonText;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+  
+  .cell:focus {
+    outline-color: ButtonText;
+    background-color: Highlight;
+    color: HighlightText;
+  }
+  
+  .cellEditing {
+    border-color: ButtonText;
+    background-color: Field;
+    color: FieldText;
+  }
+  
+  .navigationMode,
+  .statusTransitionHints {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 2px solid ButtonText;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .keyboardFocused,
+  .cell,
+  .shortcutHint,
+  .navigationMode,
+  .statusTransitionHints {
+    transition: none;
+  }
+}

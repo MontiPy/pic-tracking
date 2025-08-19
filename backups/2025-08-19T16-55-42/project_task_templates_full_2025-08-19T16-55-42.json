@@ -1,0 +1,214 @@
+[
+  {
+    "id": "cmeiryqh4000inikco6ukry0p",
+    "projectId": "cmeiryqfo0000nikcuccrx7qr",
+    "taskId": "cmeiryqge0008nikcys7rm9nn",
+    "sectionId": "cmeiryqg90006nikcofb6v6ll",
+    "dueDate": "2025-09-18T16:45:24.230Z",
+    "owner": "John Smith",
+    "notes": "Critical path item for 3FS project",
+    "isActive": true,
+    "anchor": "PROJECT_START",
+    "offsetDays": 30,
+    "createdAt": "2025-08-19T16:45:24.232Z",
+    "updatedAt": "2025-08-19T16:45:24.232Z",
+    "project": {
+      "id": "cmeiryqfo0000nikcuccrx7qr",
+      "name": "3FS V2",
+      "description": "Three-Function System development project (V2 Schema)",
+      "createdAt": "2025-08-19T16:45:24.180Z",
+      "updatedAt": "2025-08-19T16:45:24.180Z"
+    },
+    "task": {
+      "id": "cmeiryqge0008nikcys7rm9nn",
+      "taskTypeId": "cmeiryqg00002nikccte15vlg",
+      "sectionId": "cmeiryqg90006nikcofb6v6ll",
+      "parentTaskId": null,
+      "name": "Gage R&R Submission",
+      "description": "Submit gage repeatability and reproducibility study",
+      "sequence": 1,
+      "defaultOwner": "Quality Engineer",
+      "defaultNotes": "Use MSA guidelines",
+      "isRequired": true,
+      "createdAt": "2025-08-19T16:45:24.206Z",
+      "updatedAt": "2025-08-19T16:45:24.206Z",
+      "milestoneId": null,
+      "taskType": {
+        "id": "cmeiryqg00002nikccte15vlg",
+        "name": "Part Approval V2",
+        "category": "Part Approval",
+        "description": "Component approvals using V2 TaskTypeSection model",
+        "createdAt": "2025-08-19T16:45:24.193Z",
+        "updatedAt": "2025-08-19T16:45:24.193Z"
+      },
+      "section": {
+        "id": "cmeiryqg90006nikcofb6v6ll",
+        "taskTypeId": "cmeiryqg00002nikccte15vlg",
+        "name": "PA3 - Production Trial",
+        "sequence": 2,
+        "description": "Production trial validation tasks",
+        "createdAt": "2025-08-19T16:45:24.201Z",
+        "updatedAt": "2025-08-19T16:45:24.201Z"
+      }
+    }
+  },
+  {
+    "id": "cmeiryqh8000knikccr4qek8n",
+    "projectId": "cmeiryqfo0000nikcuccrx7qr",
+    "taskId": "cmeiryqgi000anikcx1mepwr9",
+    "sectionId": "cmeiryqg90006nikcofb6v6ll",
+    "dueDate": "2025-09-20T16:45:24.230Z",
+    "owner": "Sarah Johnson",
+    "notes": "Must align with Gage R&R completion",
+    "isActive": true,
+    "anchor": "RELATIVE_TO_TASK",
+    "offsetDays": 2,
+    "createdAt": "2025-08-19T16:45:24.237Z",
+    "updatedAt": "2025-08-19T16:45:24.237Z",
+    "project": {
+      "id": "cmeiryqfo0000nikcuccrx7qr",
+      "name": "3FS V2",
+      "description": "Three-Function System development project (V2 Schema)",
+      "createdAt": "2025-08-19T16:45:24.180Z",
+      "updatedAt": "2025-08-19T16:45:24.180Z"
+    },
+    "task": {
+      "id": "cmeiryqgi000anikcx1mepwr9",
+      "taskTypeId": "cmeiryqg00002nikccte15vlg",
+      "sectionId": "cmeiryqg90006nikcofb6v6ll",
+      "parentTaskId": null,
+      "name": "Drawing Approval",
+      "description": "Submit and approve technical drawings",
+      "sequence": 2,
+      "defaultOwner": "Design Engineer",
+      "defaultNotes": null,
+      "isRequired": true,
+      "createdAt": "2025-08-19T16:45:24.211Z",
+      "updatedAt": "2025-08-19T16:45:24.211Z",
+      "milestoneId": null,
+      "taskType": {
+        "id": "cmeiryqg00002nikccte15vlg",
+        "name": "Part Approval V2",
+        "category": "Part Approval",
+        "description": "Component approvals using V2 TaskTypeSection model",
+        "createdAt": "2025-08-19T16:45:24.193Z",
+        "updatedAt": "2025-08-19T16:45:24.193Z"
+      },
+      "section": {
+        "id": "cmeiryqg90006nikcofb6v6ll",
+        "taskTypeId": "cmeiryqg00002nikccte15vlg",
+        "name": "PA3 - Production Trial",
+        "sequence": 2,
+        "description": "Production trial validation tasks",
+        "createdAt": "2025-08-19T16:45:24.201Z",
+        "updatedAt": "2025-08-19T16:45:24.201Z"
+      }
+    }
+  },
+  {
+    "id": "cmeiryqhc000mnikc2aavq0yy",
+    "projectId": "cmeiryqfo0000nikcuccrx7qr",
+    "taskId": "cmeiryqgo000cnikc9yz1r2ir",
+    "sectionId": "cmeiryqg90006nikcofb6v6ll",
+    "dueDate": "2025-09-19T16:45:24.230Z",
+    "owner": "Engineering Team",
+    "notes": "Sub-task: Complete before parent task",
+    "isActive": true,
+    "anchor": "PROJECT_START",
+    "offsetDays": 31,
+    "createdAt": "2025-08-19T16:45:24.241Z",
+    "updatedAt": "2025-08-19T16:45:24.241Z",
+    "project": {
+      "id": "cmeiryqfo0000nikcuccrx7qr",
+      "name": "3FS V2",
+      "description": "Three-Function System development project (V2 Schema)",
+      "createdAt": "2025-08-19T16:45:24.180Z",
+      "updatedAt": "2025-08-19T16:45:24.180Z"
+    },
+    "task": {
+      "id": "cmeiryqgo000cnikc9yz1r2ir",
+      "taskTypeId": "cmeiryqg00002nikccte15vlg",
+      "sectionId": "cmeiryqg90006nikcofb6v6ll",
+      "parentTaskId": "cmeiryqgi000anikcx1mepwr9",
+      "name": "Drawing Review Checklist",
+      "description": "Complete internal drawing review checklist",
+      "sequence": 1,
+      "defaultOwner": "Senior Engineer",
+      "defaultNotes": null,
+      "isRequired": true,
+      "createdAt": "2025-08-19T16:45:24.216Z",
+      "updatedAt": "2025-08-19T16:45:24.216Z",
+      "milestoneId": null,
+      "taskType": {
+        "id": "cmeiryqg00002nikccte15vlg",
+        "name": "Part Approval V2",
+        "category": "Part Approval",
+        "description": "Component approvals using V2 TaskTypeSection model",
+        "createdAt": "2025-08-19T16:45:24.193Z",
+        "updatedAt": "2025-08-19T16:45:24.193Z"
+      },
+      "section": {
+        "id": "cmeiryqg90006nikcofb6v6ll",
+        "taskTypeId": "cmeiryqg00002nikccte15vlg",
+        "name": "PA3 - Production Trial",
+        "sequence": 2,
+        "description": "Production trial validation tasks",
+        "createdAt": "2025-08-19T16:45:24.201Z",
+        "updatedAt": "2025-08-19T16:45:24.201Z"
+      }
+    }
+  },
+  {
+    "id": "cmeiryqhg000onikcshbw9k60",
+    "projectId": "cmeiryqfo0000nikcuccrx7qr",
+    "taskId": "cmeiryqgs000enikclgyvgo7v",
+    "sectionId": "cmeiryqg40004nikcy5k76isz",
+    "dueDate": "2025-09-08T16:45:24.230Z",
+    "owner": "QC Team",
+    "notes": "Required before PA3 tasks",
+    "isActive": true,
+    "anchor": "PROJECT_START",
+    "offsetDays": 20,
+    "createdAt": "2025-08-19T16:45:24.245Z",
+    "updatedAt": "2025-08-19T16:45:24.245Z",
+    "project": {
+      "id": "cmeiryqfo0000nikcuccrx7qr",
+      "name": "3FS V2",
+      "description": "Three-Function System development project (V2 Schema)",
+      "createdAt": "2025-08-19T16:45:24.180Z",
+      "updatedAt": "2025-08-19T16:45:24.180Z"
+    },
+    "task": {
+      "id": "cmeiryqgs000enikclgyvgo7v",
+      "taskTypeId": "cmeiryqg00002nikccte15vlg",
+      "sectionId": "cmeiryqg40004nikcy5k76isz",
+      "parentTaskId": null,
+      "name": "Initial Inspection Report",
+      "description": "Submit first article inspection report",
+      "sequence": 1,
+      "defaultOwner": "QC Inspector",
+      "defaultNotes": null,
+      "isRequired": true,
+      "createdAt": "2025-08-19T16:45:24.220Z",
+      "updatedAt": "2025-08-19T16:45:24.220Z",
+      "milestoneId": null,
+      "taskType": {
+        "id": "cmeiryqg00002nikccte15vlg",
+        "name": "Part Approval V2",
+        "category": "Part Approval",
+        "description": "Component approvals using V2 TaskTypeSection model",
+        "createdAt": "2025-08-19T16:45:24.193Z",
+        "updatedAt": "2025-08-19T16:45:24.193Z"
+      },
+      "section": {
+        "id": "cmeiryqg40004nikcy5k76isz",
+        "taskTypeId": "cmeiryqg00002nikccte15vlg",
+        "name": "PA2 - First Article",
+        "sequence": 1,
+        "description": "First Article Inspection tasks",
+        "createdAt": "2025-08-19T16:45:24.197Z",
+        "updatedAt": "2025-08-19T16:45:24.197Z"
+      }
+    }
+  }
+]

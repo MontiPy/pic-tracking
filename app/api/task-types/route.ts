@@ -1,18 +1,21 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import { createNotFoundError, createValidationError } from '@/lib/validation'
 
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
-    const includeMilestones = searchParams.get('includeMilestones') === 'true'
+    const includeSections = searchParams.get('includeSections') === 'true'
+    const includeMilestones = searchParams.get('includeMilestones') === 'true' // legacy support
     const category = searchParams.get('category')
 
     // Build where clause for category filter
     const whereClause = category ? { category } : {}
 
-    if (!includeMilestones) {
+    // Support both new sections and legacy milestones
+    const includeDetails = includeSections || includeMilestones
+
+    if (!includeDetails) {
       const taskTypes = await prisma.taskType.findMany({
         where: whereClause,
         select: {
@@ -31,11 +34,39 @@ export async function GET(request: Request) {
       return NextResponse.json(taskTypes)
     }
 
-    // Enhanced query with milestones and tasks
+    // Enhanced query with sections/milestones and tasks
     const taskTypes = await prisma.taskType.findMany({
       where: whereClause,
       include: {
-        milestones: {
+        // V2 sections
+        sections: {
+          include: {
+            tasks: {
+              include: {
+                subTasks: {
+                  select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    sequence: true,
+                    isRequired: true,
+                    defaultOwner: true,
+                    defaultNotes: true
+                  },
+                  orderBy: { sequence: 'asc' }
+                }
+              },
+              where: { parentTaskId: null }, // Only parent tasks
+              orderBy: { sequence: 'asc' }
+            },
+            _count: {
+              select: { tasks: true }
+            }
+          },
+          orderBy: { sequence: 'asc' }
+        },
+        // Legacy milestones (for backward compatibility)
+        milestones: includeMilestones ? {
           include: {
             tasks: {
               select: {
@@ -55,10 +86,12 @@ export async function GET(request: Request) {
             }
           },
           orderBy: { sequence: 'asc' }
-        },
+        } : false,
         _count: {
           select: {
-            milestones: true
+            sections: true,
+            milestones: true,
+            tasks: true
           }
         }
       },
@@ -73,45 +106,35 @@ export async function GET(request: Request) {
       meta: {
         total: taskTypes.length,
         categories: [...new Set(taskTypes.map(tt => tt.category))],
-        includeMilestones,
+        includeSections,
+        includeMilestones: includeMilestones || false,
         generatedAt: new Date().toISOString()
       }
     })
   } catch (error) {
     console.error('Error fetching task types:', error)
-    return NextResponse.json({ error: 'Failed to fetch task types' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch task types' 
+    }, { status: 500 })
   }
 }
 
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, category, description } = body
-
-    if (!name || !category) {
+    const { taskTypeSchema } = await import('@/lib/validation')
+    
+    // Validate input
+    const validationResult = taskTypeSchema.safeParse(body)
+    if (!validationResult.success) {
       return NextResponse.json(
-        { error: 'Name and category are required' },
+        createValidationError('body', validationResult.error.issues[0].message),
         { status: 400 }
       )
     }
 
-    // Validate category against manufacturing categories
-    const validCategories = [
-      'Part Approval',
-      'Production Readiness', 
-      'New Model Builds',
-      'General'
-    ]
-
-    if (!validCategories.includes(category)) {
-      return NextResponse.json(
-        { 
-          error: `Invalid category. Must be one of: ${validCategories.join(', ')}`,
-          validCategories 
-        },
-        { status: 400 }
-      )
-    }
+    const { name, category, description } = validationResult.data
 
     const taskType = await prisma.taskType.create({
       data: {
@@ -120,39 +143,56 @@ export async function POST(request: Request) {
         description: description || ''
       },
       include: {
-        milestones: {
+        sections: {
           include: {
             tasks: {
-              select: {
-                id: true,
-                name: true,
-                description: true,
-                sequence: true,
-                isRequired: true
+              include: {
+                subTasks: {
+                  select: {
+                    id: true,
+                    name: true,
+                    description: true,
+                    sequence: true,
+                    isRequired: true,
+                    defaultOwner: true,
+                    defaultNotes: true
+                  },
+                  orderBy: { sequence: 'asc' }
+                }
               },
+              where: { parentTaskId: null },
               orderBy: { sequence: 'asc' }
+            },
+            _count: {
+              select: { tasks: true }
             }
           },
           orderBy: { sequence: 'asc' }
         },
         _count: {
           select: {
-            milestones: true
+            sections: true,
+            tasks: true
           }
         }
       }
     })
 
-    return NextResponse.json(taskType)
+    return NextResponse.json(taskType, { status: 201 })
   } catch (error) {
     console.error('Error creating task type:', error)
     if (error.code === 'P2002') {
       return NextResponse.json(
-        { error: 'Task type name must be unique' },
+        { 
+          error: 'CONFLICT',
+          message: 'Task type name must be unique' 
+        },
         { status: 409 }
       )
     }
-    return NextResponse.json({ error: 'Failed to create task type' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to create task type' 
+    }, { status: 500 })
   }
 }
-

@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import Layout from '@/components/layout/Layout'
 import { Calendar, Clock, AlertTriangle, CheckCircle, Users, Building2 } from 'lucide-react'
 import Modal from '@/components/ui/Modal'
-import TaskTemplateForm from '@/components/forms/TaskTemplateForm'
+import ProjectTemplateForm from '@/components/forms/ProjectTemplateForm'
 
 interface TaskInstance {
   id: string
@@ -515,7 +515,7 @@ export default function SchedulePage() {
         title="Add Task Template"
       >
         {selectedProject && (
-          <TaskTemplateForm
+          <ProjectTemplateForm
             projectId={selectedProject.id}
             onCreated={(tpl) => {
               // Update selected project with new template

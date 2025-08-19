@@ -1,14 +1,13 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { TaskSyncService } from '@/lib/task-sync'
-
-const prisma = new PrismaClient()
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params
     const body = await request.json()
     const { taskTypeId, canonicalDue, description } = body as {
       taskTypeId?: string
@@ -22,7 +21,7 @@ export async function POST(
 
     // Validate project and task type
     const [project, taskType] = await Promise.all([
-      prisma.project.findUnique({ where: { id: params.id }, select: { id: true } }),
+      prisma.project.findUnique({ where: { id }, select: { id: true } }),
       prisma.taskType.findUnique({ where: { id: taskTypeId }, select: { id: true, name: true, category: true } })
     ])
 
@@ -34,7 +33,7 @@ export async function POST(
       // Create the template
       const template = await tx.taskTemplate.create({
         data: {
-          projectId: params.id,
+          projectId: id,
           taskTypeId,
           canonicalDue: new Date(canonicalDue),
           description: description || ''

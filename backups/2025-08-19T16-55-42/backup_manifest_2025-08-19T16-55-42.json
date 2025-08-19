@@ -1,0 +1,141 @@
+{
+  "timestamp": "2025-08-19T16-55-42",
+  "backupType": "comprehensive_v2_post_migration",
+  "database": {
+    "source": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\prisma\\dev.db",
+    "backup": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\database_2025-08-19T16-55-42.db",
+    "statistics": {
+      "suppliers": 1,
+      "projects": 1,
+      "taskTypes": 1,
+      "taskTypeSections": 2,
+      "tasks": 4,
+      "projectTaskTemplates": 4,
+      "supplierTaskInstances": 4,
+      "supplierProjectInstances": 1,
+      "total": 18
+    }
+  },
+  "criticalData": {
+    "exports": [
+      {
+        "file": "supplier_task_instances_full_2025-08-19T16-55-42.json",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\supplier_task_instances_full_2025-08-19T16-55-42.json",
+        "type": "json"
+      },
+      {
+        "file": "supplier_task_instances_full_2025-08-19T16-55-42.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\supplier_task_instances_full_2025-08-19T16-55-42.csv",
+        "type": "csv"
+      },
+      {
+        "file": "project_task_templates_full_2025-08-19T16-55-42.json",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\project_task_templates_full_2025-08-19T16-55-42.json",
+        "type": "json"
+      },
+      {
+        "file": "project_task_templates_full_2025-08-19T16-55-42.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\project_task_templates_full_2025-08-19T16-55-42.csv",
+        "type": "csv"
+      },
+      {
+        "file": "task_type_sections_2025-08-19T16-55-42.json",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\task_type_sections_2025-08-19T16-55-42.json",
+        "type": "json"
+      },
+      {
+        "file": "task_type_sections_2025-08-19T16-55-42.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\task_type_sections_2025-08-19T16-55-42.csv",
+        "type": "csv"
+      },
+      {
+        "file": "tasks_full_2025-08-19T16-55-42.json",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\tasks_full_2025-08-19T16-55-42.json",
+        "type": "json"
+      },
+      {
+        "file": "tasks_full_2025-08-19T16-55-42.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\tasks_full_2025-08-19T16-55-42.csv",
+        "type": "csv"
+      },
+      {
+        "file": "suppliers_2025-08-19T16-55-42.json",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\suppliers_2025-08-19T16-55-42.json",
+        "type": "json"
+      },
+      {
+        "file": "suppliers_2025-08-19T16-55-42.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\suppliers_2025-08-19T16-55-42.csv",
+        "type": "csv"
+      },
+      {
+        "file": "projects_2025-08-19T16-55-42.json",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\projects_2025-08-19T16-55-42.json",
+        "type": "json"
+      },
+      {
+        "file": "projects_2025-08-19T16-55-42.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\projects_2025-08-19T16-55-42.csv",
+        "type": "csv"
+      },
+      {
+        "file": "task_types_2025-08-19T16-55-42.json",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\task_types_2025-08-19T16-55-42.json",
+        "type": "json"
+      },
+      {
+        "file": "task_types_2025-08-19T16-55-42.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\task_types_2025-08-19T16-55-42.csv",
+        "type": "csv"
+      },
+      {
+        "file": "supplier_project_instances_2025-08-19T16-55-42.json",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\supplier_project_instances_2025-08-19T16-55-42.json",
+        "type": "json"
+      },
+      {
+        "file": "supplier_project_instances_2025-08-19T16-55-42.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\supplier_project_instances_2025-08-19T16-55-42.csv",
+        "type": "csv"
+      }
+    ]
+  },
+  "schema": {
+    "source": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\prisma\\schema.prisma",
+    "backup": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\schema_2025-08-19T16-55-42.prisma"
+  },
+  "system": {
+    "nodeVersion": "v18.20.4",
+    "platform": "win32",
+    "cwd": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking",
+    "timestamp": "2025-08-19T16:55:42.762Z"
+  },
+  "migration": {
+    "phase": "post_v2_migration",
+    "status": "v2_complete_legacy_cleanup_pending",
+    "v2Models": [
+      "TaskTypeSection",
+      "ProjectTaskTemplate",
+      "SupplierTaskInstance"
+    ],
+    "legacyModels": [
+      "Milestone",
+      "ProjectMilestoneTask"
+    ]
+  },
+  "restoration": {
+    "instructions": [
+      "1. Stop the application",
+      "2. Restore database: copy backup file over current database",
+      "3. Restore schema: copy schema backup over current schema",
+      "4. Run: npm run db:generate",
+      "5. Restart application",
+      "6. Verify data integrity"
+    ],
+    "commands": {
+      "database": "copy \"C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\database_2025-08-19T16-55-42.db\" \"C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\prisma\\dev.db\"",
+      "schema": "copy \"C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-55-42\\schema_2025-08-19T16-55-42.prisma\" \"C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\prisma\\schema.prisma\"",
+      "generate": "npm run db:generate"
+    }
+  }
+}

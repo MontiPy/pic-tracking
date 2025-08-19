@@ -1,8 +1,6 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { cache, CacheKeys, CacheTTL } from '@/lib/cache'
-
-const prisma = new PrismaClient()
 
 export async function GET() {
   try {
@@ -18,76 +16,45 @@ export async function GET() {
     weekFromNow.setDate(weekFromNow.getDate() + 7)
 
     // Execute multiple queries in parallel for performance
-    const [
-      supplierCount,
-      projectCount,
-      taskStats,
-      overdueTasks,
-      upcomingTasks,
-      recentActivity,
-      supplierPerformance
-    ] = await Promise.all([
-      // Total suppliers
+    const [supplierCount, projectCount] = await Promise.all([
       prisma.supplier.count(),
-      
-      // Total active projects
-      prisma.project.count(),
-      
-      // Task status distribution
-      prisma.taskInstance.groupBy({
-        by: ['status'],
-        _count: {
-          id: true
-        }
+      prisma.project.count()
+    ])
+
+    // Prefer new-model counts; fall back to legacy if none
+    const [newTaskStats, newOverdue, newUpcoming, newRecent] = await Promise.all([
+      prisma.supplierTaskInstance.groupBy({ by: ['status'], _count: { id: true } }),
+      prisma.supplierTaskInstance.count({
+        where: { status: { not: 'completed' }, OR: [ { actualDueDate: { lt: now } }, { AND: [ { actualDueDate: null }, { dueDate: { lt: now } } ] } ] }
       }),
-      
-      // Overdue tasks
-      prisma.taskInstance.count({
-        where: {
-          status: { not: 'completed' },
-          actualDue: { lt: now }
-        }
+      prisma.supplierTaskInstance.count({
+        where: { status: { not: 'completed' }, OR: [
+          { AND: [ { actualDueDate: { gte: now } }, { actualDueDate: { lte: weekFromNow } } ] },
+          { AND: [ { actualDueDate: null }, { dueDate: { gte: now } }, { dueDate: { lte: weekFromNow } } ] }
+        ] }
       }),
-      
-      // Tasks due within a week
-      prisma.taskInstance.count({
-        where: {
-          status: { not: 'completed' },
-          actualDue: {
-            gte: now,
-            lte: weekFromNow
-          }
-        }
-      }),
-      
-      // Recent activity (tasks updated in last 7 days)
-      prisma.taskInstance.count({
-        where: {
-          updatedAt: {
-            gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000)
-          }
-        }
-      }),
-      
-      // Supplier performance summary
-      prisma.supplier.findMany({
-        select: {
-          id: true,
-          name: true,
-          supplierProjects: {
-            select: {
-              taskInstances: {
-                select: {
-                  status: true,
-                  actualDue: true,
-                  completedAt: true
-                }
-              }
-            }
-          }
-        }
+      prisma.supplierTaskInstance.count({
+        where: { updatedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } }
       })
     ])
+
+    let taskStats = newTaskStats
+    let overdueTasks = newOverdue
+    let upcomingTasks = newUpcoming
+    let recentActivity = newRecent
+
+    if (taskStats.length === 0) {
+      const [legacyStats, legacyOverdue, legacyUpcoming, legacyRecent] = await Promise.all([
+        prisma.taskInstance.groupBy({ by: ['status'], _count: { id: true } }),
+        prisma.taskInstance.count({ where: { status: { not: 'completed' }, actualDue: { lt: now } } }),
+        prisma.taskInstance.count({ where: { status: { not: 'completed' }, actualDue: { gte: now, lte: weekFromNow } } }),
+        prisma.taskInstance.count({ where: { updatedAt: { gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) } } })
+      ])
+      taskStats = legacyStats
+      overdueTasks = legacyOverdue
+      upcomingTasks = legacyUpcoming
+      recentActivity = legacyRecent
+    }
 
     // Process task statistics
     const taskStatusCounts = {
@@ -99,7 +66,7 @@ export async function GET() {
       cancelled: 0
     }
 
-    taskStats.forEach(stat => {
+    taskStats.forEach((stat: any) => {
       taskStatusCounts[stat.status as keyof typeof taskStatusCounts] = stat._count.id
       taskStatusCounts.total += stat._count.id
     })
@@ -110,20 +77,42 @@ export async function GET() {
       : 0
 
     // Process supplier performance
-    const supplierPerformanceData = supplierPerformance.map(supplier => {
-      const allTasks = supplier.supplierProjects.flatMap(sp => sp.taskInstances)
-      const completedTasks = allTasks.filter(t => t.status === 'completed')
-      const overdueTasks = allTasks.filter(t => 
-        t.status !== 'completed' && t.actualDue && new Date(t.actualDue) < now
-      )
-      
+    // Supplier performance with new model
+    const suppliers = await prisma.supplier.findMany({
+      select: {
+        id: true,
+        name: true,
+        supplierProjectInstances: {
+          select: {
+            supplierTaskInstances: { select: { status: true, dueDate: true, actualDueDate: true, completedAt: true } }
+          }
+        },
+        supplierProjects: {
+          select: { taskInstances: { select: { status: true, actualDue: true, completedAt: true } } }
+        }
+      }
+    })
+
+    const supplierPerformanceData = suppliers.map(supplier => {
+      const newTasks = supplier.supplierProjectInstances.flatMap(spi => spi.supplierTaskInstances)
+      const oldTasks = supplier.supplierProjects.flatMap(sp => sp.taskInstances)
+      const useNew = newTasks.length > 0
+      const allTasks = useNew ? newTasks : oldTasks
+
+      const isOverdue = (t: any) => {
+        const due = useNew ? (t.actualDueDate || t.dueDate) : t.actualDue
+        return t.status !== 'completed' && due && new Date(due) < now
+      }
+      const completed = allTasks.filter(t => t.status === 'completed')
+      const overdue = allTasks.filter(isOverdue)
+
       return {
         id: supplier.id,
         name: supplier.name,
         totalTasks: allTasks.length,
-        completedTasks: completedTasks.length,
-        overdueTasks: overdueTasks.length,
-        completionRatio: allTasks.length > 0 ? (completedTasks.length / allTasks.length) * 100 : 0
+        completedTasks: completed.length,
+        overdueTasks: overdue.length,
+        completionRatio: allTasks.length > 0 ? (completed.length / allTasks.length) * 100 : 0
       }
     }).sort((a, b) => b.completionRatio - a.completionRatio)
 
@@ -134,17 +123,8 @@ export async function GET() {
       .slice(0, 5)
 
     // Category breakdown
-    const categoryStats = await prisma.taskInstance.groupBy({
-      by: ['status'],
-      _count: { id: true },
-      where: {
-        taskTemplate: {
-          taskType: {
-            category: { not: null }
-          }
-        }
-      }
-    })
+    // Category breakdown (new model not directly grouped by category in a single query)
+    const categoryStats = taskStatusCounts
 
     // Project status overview
     const projectStats = await prisma.project.findMany({

@@ -101,6 +101,27 @@ export default function SuppliersPage() {
   const [bulkActionLoading, setBulkActionLoading] = useState(false)
   const [customizingTask, setCustomizingTask] = useState<any>(null) // task instance for customization
   const [customizationLoading, setCustomizationLoading] = useState(false)
+  const toggleNewModelApplied = async (instanceId: string, nextApplied: boolean) => {
+    try {
+      const res = await fetch(`/api/supplier-task-instances/${instanceId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ isApplied: nextApplied })
+      })
+      if (!res.ok) throw new Error('Failed to update')
+      const updated = await res.json()
+      setSuppliers(prev => prev.map(s => ({
+        ...s,
+        supplierProjectInstances: s.supplierProjectInstances?.map(spi => ({
+          ...spi,
+          supplierTaskInstances: spi.supplierTaskInstances.map(sti => sti.id === instanceId ? { ...sti, isApplied: updated.isApplied } : sti)
+        }))
+      })))
+    } catch (e) {
+      console.error(e)
+      alert('Could not update applied state')
+    }
+  }
 
   useEffect(() => {
     fetch('/api/suppliers?includeStats=true')
@@ -228,6 +249,28 @@ export default function SuppliersPage() {
     }
   }
 
+  const updateNewModelInstanceStatus = async (instanceId: string, newStatus: string) => {
+    try {
+      const res = await fetch(`/api/supplier-task-instances/${instanceId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus })
+      })
+      if (!res.ok) throw new Error('Failed to update status')
+      const updated = await res.json()
+      setSuppliers(prev => prev.map(s => ({
+        ...s,
+        supplierProjectInstances: s.supplierProjectInstances?.map(spi => ({
+          ...spi,
+          supplierTaskInstances: spi.supplierTaskInstances.map(sti => sti.id === instanceId ? { ...sti, status: updated.status } : sti)
+        }))
+      })))
+    } catch (e) {
+      console.error(e)
+      alert('Could not update status')
+    }
+  }
+
   const toggleSupplierSelection = (supplierId: string) => {
     setSelectedSuppliers(prev => {
       const newSet = new Set(prev)
@@ -299,6 +342,8 @@ export default function SuppliersPage() {
     notes?: string
     customFields?: any
     status?: string
+    isApplied?: boolean
+    responsibleParties?: any
   }) => {
     if (!customizingTask) return
     
@@ -317,7 +362,9 @@ export default function SuppliersPage() {
           actualDueDate: data.actualDueDate,
           notes: data.notes,
           customFields: data.customFields ? JSON.stringify(data.customFields) : undefined,
-          status: data.status
+          status: data.status,
+          isApplied: typeof data.isApplied === 'boolean' ? data.isApplied : undefined,
+          responsibleParties: data.responsibleParties
         })
       })
 
@@ -595,12 +642,12 @@ export default function SuppliersPage() {
                               
                               {/* New Model Task Instances */}
                               <div className="space-y-1">
-                                {spi.supplierTaskInstances.filter(sti => sti.isApplied).length === 0 ? (
-                                  <p className="text-xs text-gray-500 italic py-2">No tasks applied to this supplier</p>
+                                {spi.supplierTaskInstances.length === 0 ? (
+                                  <p className="text-xs text-gray-500 italic py-2">No tasks defined for this project</p>
                                 ) : (
                                   <div className="space-y-1">
-                                    {spi.supplierTaskInstances.filter(sti => sti.isApplied).map((sti) => (
-                                      <div key={sti.id} className="flex items-center justify-between py-1.5 px-2 bg-white rounded text-xs border">
+                                    {spi.supplierTaskInstances.map((sti) => (
+                                      <div key={sti.id} className={`flex items-center justify-between py-1.5 px-2 rounded text-xs border ${sti.isApplied ? 'bg-white' : 'bg-gray-50 opacity-80'}`}>
                                         <div className="flex items-center gap-2 flex-1 min-w-0">
                                           <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getStatusColor(sti.status).split(' ')[1]}`}></div>
                                           <span className="font-medium truncate">{sti.projectMilestoneTask.task.name}</span>
@@ -610,12 +657,34 @@ export default function SuppliersPage() {
                                           <span className="px-1 py-0.5 bg-gray-100 text-gray-600 rounded text-xs flex-shrink-0">
                                             {sti.projectMilestoneTask.milestone.taskType.category}
                                           </span>
+                                          {/* Responsible parties (compact) */}
+                                          {(() => {
+                                            const rp = (sti as any).responsibleParties
+                                            if (!rp) return null
+                                            let text = ''
+                                            try {
+                                              const obj = typeof rp === 'string' ? JSON.parse(rp) : rp
+                                              text = Object.entries(obj).map(([k,v]) => `${k}: ${String(v)}`).slice(0,2).join(', ')
+                                            } catch { text = String(rp) }
+                                            return text ? (
+                                              <span className="text-gray-500 truncate">RP: {text}</span>
+                                            ) : null
+                                          })()}
                                         </div>
                                         <div className="flex items-center gap-2 flex-shrink-0">
                                           <span className="text-gray-500 text-xs">Due: {formatShortDate(sti.actualDueDate || sti.dueDate)}</span>
+                                          <label className="inline-flex items-center gap-1">
+                                            <input
+                                              type="checkbox"
+                                              className="rounded border-gray-300"
+                                              checked={!!sti.isApplied}
+                                              onChange={(e) => toggleNewModelApplied(sti.id, e.target.checked)}
+                                            />
+                                            <span>Applied</span>
+                                          </label>
                                           <select
                                             value={sti.status}
-                                            onChange={(e) => updateInstanceStatus(sti.id, e.target.value)}
+                                            onChange={(e) => updateNewModelInstanceStatus(sti.id, e.target.value)}
                                             className="border border-gray-300 rounded px-1 py-0.5 text-xs"
                                           >
                                             <option value="not_started">Not started</option>

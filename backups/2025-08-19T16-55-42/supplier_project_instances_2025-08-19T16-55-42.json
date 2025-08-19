@@ -1,0 +1,28 @@
+[
+  {
+    "id": "cmeiryqhk000qnikc26kkutuc",
+    "supplierId": "cmeiryqfv0001nikcje74kqya",
+    "projectId": "cmeiryqfo0000nikcuccrx7qr",
+    "status": "active",
+    "assignedAt": "2025-08-19T16:45:24.249Z",
+    "createdAt": "2025-08-19T16:45:24.249Z",
+    "updatedAt": "2025-08-19T16:45:24.249Z",
+    "supplier": {
+      "id": "cmeiryqfv0001nikcje74kqya",
+      "name": "Precision Manufacturing Corp V2",
+      "supplierNumber": "PMC-001-V2",
+      "location": "Detroit, MI",
+      "contacts": "[{\"name\":\"John Smith\",\"role\":\"Engineering Manager\",\"email\":\"j.smith@precision-mfg.com\",\"phone\":\"+1-555-0101\"}]",
+      "contactInfo": "contact@precision-mfg.com | +1-555-0101",
+      "createdAt": "2025-08-19T16:45:24.187Z",
+      "updatedAt": "2025-08-19T16:45:24.187Z"
+    },
+    "project": {
+      "id": "cmeiryqfo0000nikcuccrx7qr",
+      "name": "3FS V2",
+      "description": "Three-Function System development project (V2 Schema)",
+      "createdAt": "2025-08-19T16:45:24.180Z",
+      "updatedAt": "2025-08-19T16:45:24.180Z"
+    }
+  }
+]

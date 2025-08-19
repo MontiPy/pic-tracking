@@ -1,0 +1,12 @@
+[
+  {
+    "id": "cmeiryqfv0001nikcje74kqya",
+    "name": "Precision Manufacturing Corp V2",
+    "supplierNumber": "PMC-001-V2",
+    "location": "Detroit, MI",
+    "contacts": "[{\"name\":\"John Smith\",\"role\":\"Engineering Manager\",\"email\":\"j.smith@precision-mfg.com\",\"phone\":\"+1-555-0101\"}]",
+    "contactInfo": "contact@precision-mfg.com | +1-555-0101",
+    "createdAt": "2025-08-19T16:45:24.187Z",
+    "updatedAt": "2025-08-19T16:45:24.187Z"
+  }
+]

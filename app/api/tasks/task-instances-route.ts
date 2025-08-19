@@ -1,8 +1,7 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
 import { CacheInvalidation } from '@/lib/cache'
-
-const prisma = new PrismaClient()
+import { bulkUpdateLegacyTaskInstancesSchema } from '@/lib/validation'
 
 // Task filtering and sorting interface
 interface TaskFilters {
@@ -232,22 +231,11 @@ export async function GET(request: Request) {
 export async function PATCH(request: Request) {
   try {
     const body = await request.json()
-    const { taskIds, updates } = body as {
-      taskIds: string[]
-      updates: {
-        status?: string
-        actualDue?: string
-        notes?: string
-      }
+    const parsed = bulkUpdateLegacyTaskInstancesSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 })
     }
-
-    if (!taskIds || !Array.isArray(taskIds) || taskIds.length === 0) {
-      return NextResponse.json({ error: 'taskIds array is required' }, { status: 400 })
-    }
-
-    if (!updates || Object.keys(updates).length === 0) {
-      return NextResponse.json({ error: 'updates object is required' }, { status: 400 })
-    }
+    const { taskIds, updates } = parsed.data
 
     // Prepare update data
     const updateData: any = {}

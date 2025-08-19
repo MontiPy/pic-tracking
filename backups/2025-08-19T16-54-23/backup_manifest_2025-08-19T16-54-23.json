@@ -1,0 +1,50 @@
+{
+  "timestamp": "2025-08-19T16-54-23",
+  "backupType": "comprehensive_v2_migration",
+  "database": {
+    "source": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\prisma\\dev.db",
+    "backup": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-54-23\\database_2025-08-19T16-54-23.db",
+    "size": "(to be calculated)"
+  },
+  "criticalData": {
+    "exports": [
+      {
+        "file": "supplier_task_instances_2025-08-19T16-54-23.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-54-23\\supplier_task_instances_2025-08-19T16-54-23.csv"
+      },
+      {
+        "file": "project_task_templates_2025-08-19T16-54-23.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-54-23\\project_task_templates_2025-08-19T16-54-23.csv"
+      },
+      {
+        "file": "task_type_sections_2025-08-19T16-54-23.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-54-23\\task_type_sections_2025-08-19T16-54-23.csv"
+      },
+      {
+        "file": "tasks_2025-08-19T16-54-23.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-54-23\\tasks_2025-08-19T16-54-23.csv"
+      },
+      {
+        "file": "suppliers_2025-08-19T16-54-23.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-54-23\\suppliers_2025-08-19T16-54-23.csv"
+      },
+      {
+        "file": "projects_2025-08-19T16-54-23.csv",
+        "fullPath": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-54-23\\projects_2025-08-19T16-54-23.csv"
+      }
+    ]
+  },
+  "schema": {
+    "source": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\prisma\\schema.prisma",
+    "backup": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking\\backups\\2025-08-19T16-54-23\\schema_2025-08-19T16-54-23.prisma"
+  },
+  "system": {
+    "nodeVersion": "v18.20.4",
+    "platform": "win32",
+    "cwd": "C:\\Users\\v0409324\\Documents\\Sandbox_Local\\pic-tracking"
+  },
+  "migration": {
+    "phase": "post_v2_migration",
+    "status": "v2_complete_legacy_cleanup_pending"
+  }
+}

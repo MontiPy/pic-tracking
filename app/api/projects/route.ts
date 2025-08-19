@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
-
-const prisma = new PrismaClient()
+import { prisma } from '@/lib/prisma'
+import { createProjectSchema } from '@/lib/validation'
 
 export async function GET(request: Request) {
   try {
@@ -156,7 +155,11 @@ export async function GET(request: Request) {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, description } = body
+    const parsed = createProjectSchema.safeParse(body)
+    if (!parsed.success) {
+      return NextResponse.json({ error: 'Invalid payload', issues: parsed.error.flatten() }, { status: 400 })
+    }
+    const { name, description } = parsed.data
 
     if (!name) {
       return NextResponse.json(

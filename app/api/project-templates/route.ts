@@ -1,116 +1,168 @@
 import { NextResponse } from 'next/server'
-import { PrismaClient } from '@prisma/client'
+import { prisma } from '@/lib/prisma'
+import { createValidationError } from '@/lib/validation'
 
-const prisma = new PrismaClient()
-
-// GET endpoint for project milestone task templates
+// GET endpoint for project task templates (V2 and legacy support)
 export async function GET(request: Request) {
   try {
     const { searchParams } = new URL(request.url)
     const projectId = searchParams.get('projectId')
+    const taskTypeId = searchParams.get('taskTypeId')
+    const sectionId = searchParams.get('sectionId')
     const includeInstances = searchParams.get('includeInstances') === 'true'
+    const legacyMode = searchParams.get('legacyMode') === 'true'
 
-    // Build where clause for project filter
-    const whereClause = projectId ? { projectId } : {}
+    // Build where clause for filtering
+    let whereClause: any = {}
+    
+    if (projectId) {
+      whereClause.projectId = projectId
+    }
+    
+    if (taskTypeId) {
+      whereClause.task = {
+        taskTypeId
+      }
+    }
+    
+    if (sectionId) {
+      whereClause.sectionId = sectionId
+    }
 
-    if (!includeInstances) {
-      const templates = await prisma.projectMilestoneTask.findMany({
-        where: whereClause,
+    const includeConfig = {
+      project: {
+        select: {
+          id: true,
+          name: true,
+          description: true
+        }
+      },
+      task: {
         include: {
-          project: {
+          taskType: {
             select: {
               id: true,
               name: true,
-              description: true
+              category: true
             }
           },
-          milestone: {
-            include: {
-              taskType: {
-                select: {
-                  id: true,
-                  name: true,
-                  category: true
-                }
-              }
-            }
-          },
-          task: {
+          section: {
             select: {
               id: true,
               name: true,
-              description: true,
-              sequence: true,
-              isRequired: true
+              sequence: true
+            }
+          },
+          parent: {
+            select: {
+              id: true,
+              name: true,
+              sequence: true
             }
           }
-        },
+        }
+      }
+    }
+
+    if (!includeInstances) {
+      // Get V2 templates
+      const v2Templates = await prisma.projectTaskTemplate.findMany({
+        where: whereClause,
+        include: includeConfig,
         orderBy: [
           { project: { name: 'asc' } },
-          { milestone: { taskType: { category: 'asc' } } },
-          { milestone: { sequence: 'asc' } },
+          { task: { taskType: { category: 'asc' } } },
+          { task: { section: { sequence: 'asc' } } },
           { task: { sequence: 'asc' } }
         ]
       })
-      return NextResponse.json(templates)
-    }
 
-    // Enhanced query with supplier task instances
-    const templates = await prisma.projectMilestoneTask.findMany({
-      where: whereClause,
-      include: {
-        project: {
-          select: {
-            id: true,
-            name: true,
-            description: true
-          }
-        },
-        milestone: {
+      // Get legacy templates if in legacy mode
+      let legacyTemplates = []
+      if (legacyMode) {
+        legacyTemplates = await prisma.projectMilestoneTask.findMany({
+          where: projectId ? { projectId } : {},
           include: {
-            taskType: {
+            project: {
               select: {
                 id: true,
                 name: true,
-                category: true
+                description: true
               }
-            }
-          }
-        },
-        task: {
-          select: {
-            id: true,
-            name: true,
-            description: true,
-            sequence: true,
-            isRequired: true
-          }
-        },
-        supplierTaskInstances: {
-          include: {
-            supplierProjectInstance: {
+            },
+            milestone: {
               include: {
-                supplier: {
+                taskType: {
                   select: {
                     id: true,
                     name: true,
-                    supplierNumber: true
+                    category: true
                   }
+                }
+              }
+            },
+            task: {
+              select: {
+                id: true,
+                name: true,
+                description: true,
+                sequence: true,
+                isRequired: true
+              }
+            }
+          },
+          orderBy: [
+            { project: { name: 'asc' } },
+            { milestone: { taskType: { category: 'asc' } } },
+            { milestone: { sequence: 'asc' } },
+            { task: { sequence: 'asc' } }
+          ]
+        })
+      }
+
+      return NextResponse.json({
+        v2Templates,
+        legacyTemplates,
+        meta: {
+          totalV2: v2Templates.length,
+          totalLegacy: legacyTemplates.length,
+          legacyMode
+        }
+      })
+    }
+
+    // Enhanced query with supplier task instances
+    const usageIncludeConfig = {
+      ...includeConfig,
+      supplierTaskInstances: {
+        include: {
+          supplierProjectInstance: {
+            include: {
+              supplier: {
+                select: {
+                  id: true,
+                  name: true,
+                  supplierNumber: true
                 }
               }
             }
           }
-        },
-        _count: {
-          select: {
-            supplierTaskInstances: true
-          }
         }
       },
+      _count: {
+        select: {
+          supplierTaskInstances: true
+        }
+      }
+    }
+
+    const templates = await prisma.projectTaskTemplate.findMany({
+      where: whereClause,
+      include: usageIncludeConfig,
       orderBy: [
         { project: { name: 'asc' } },
-        { milestone: { taskType: { category: 'asc' } } },
-        { milestone: { sequence: 'asc' } },
+        { task: { taskType: { category: 'asc' } } },
+        { task: { section: { sequence: 'asc' } } },
         { task: { sequence: 'asc' } }
       ]
     })
@@ -125,8 +177,9 @@ export async function GET(request: Request) {
           totalSuppliers: template.supplierTaskInstances.length,
           appliedSuppliers: appliedInstances.length,
           completedSuppliers: appliedInstances.filter(sti => sti.status === 'completed').length,
+          approvedSuppliers: appliedInstances.filter(sti => sti.status === 'approved').length,
           overdueSuppliers: appliedInstances.filter(sti => {
-            if (sti.status === 'completed') return false
+            if (['completed', 'approved'].includes(sti.status)) return false
             const dueDate = sti.actualDueDate || sti.dueDate
             return dueDate && new Date(dueDate) < new Date()
           }).length
@@ -139,14 +192,18 @@ export async function GET(request: Request) {
       meta: {
         total: templates.length,
         projects: [...new Set(templates.map(t => t.project.name))],
-        categories: [...new Set(templates.map(t => t.milestone.taskType.category))],
+        sections: [...new Set(templates.map(t => t.task.section?.name).filter(Boolean))],
+        categories: [...new Set(templates.map(t => t.task.taskType.category))],
         includeInstances,
         generatedAt: new Date().toISOString()
       }
     })
   } catch (error) {
     console.error('Error fetching project templates:', error)
-    return NextResponse.json({ error: 'Failed to fetch project templates' }, { status: 500 })
+    return NextResponse.json({ 
+      error: 'INTERNAL_ERROR',
+      message: 'Failed to fetch project templates' 
+    }, { status: 500 })
   }
 }
 
