@@ -4,10 +4,10 @@ import { TaskSyncService } from '@/lib/task-sync'
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ projectId: string }> }
+  { params }: { params: { projectId: string } }
 ) {
   try {
-    const { projectId } = await params
+    const { projectId } = params
     const body = await request.json()
     const { taskTypeId, canonicalDue, description } = body as {
       taskTypeId?: string

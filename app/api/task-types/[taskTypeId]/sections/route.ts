@@ -8,10 +8,10 @@ import {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string }> }
+  { params }: { params: { taskTypeId: string } }
 ) {
   try {
-    const { taskTypeId } = await params
+    const { taskTypeId } = params
 
     // Verify task type exists
     const taskType = await prisma.taskType.findUnique({
@@ -73,10 +73,10 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string }> }
+  { params }: { params: { taskTypeId: string } }
 ) {
   try {
-    const { taskTypeId } = await params
+    const { taskTypeId } = params
     const body = await request.json()
 
     // Add taskTypeId to the body for validation

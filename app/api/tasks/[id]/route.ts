@@ -5,10 +5,10 @@ import { createNotFoundError } from '@/lib/validation'
 // GET endpoint for individual task with full details (V2 and legacy support)
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
+    const { id } = params
     
     const task = await prisma.task.findUnique({
       where: { id },
@@ -195,10 +195,10 @@ export async function GET(
 // PUT endpoint for updating tasks (V2 support)
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
+    const { id } = params
     const body = await request.json()
     const { updateTaskSchema } = await import('@/lib/validation')
 
@@ -307,10 +307,10 @@ export async function PUT(
 // DELETE endpoint for tasks (V2 support)
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const { id } = await params
+    const { id } = params
 
     // Check if task exists and has dependencies
     const task = await prisma.task.findUnique({

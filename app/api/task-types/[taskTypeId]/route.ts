@@ -9,10 +9,10 @@ import {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string }> }
+  { params }: { params: { taskTypeId: string } }
 ) {
   try {
-    const { taskTypeId } = await params
+    const { taskTypeId } = params
     const { searchParams } = new URL(request.url)
     const includeSections = searchParams.get('includeSections') === 'true'
 
@@ -73,10 +73,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string }> }
+  { params }: { params: { taskTypeId: string } }
 ) {
   try {
-    const { taskTypeId } = await params
+    const { taskTypeId } = params
     const body = await request.json()
 
     // Validate input
@@ -157,10 +157,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string }> }
+  { params }: { params: { taskTypeId: string } }
 ) {
   try {
-    const { taskTypeId } = await params
+    const { taskTypeId } = params
 
     // Check if task type exists
     const existingTaskType = await prisma.taskType.findUnique({

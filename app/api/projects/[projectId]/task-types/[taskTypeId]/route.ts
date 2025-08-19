@@ -7,10 +7,10 @@ import {
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ projectId: string; taskTypeId: string }> }
+  { params }: { params: { projectId: string; taskTypeId: string } }
 ) {
   try {
-    const { projectId, taskTypeId } = await params
+    const { projectId, taskTypeId } = params
 
     // Check if the association exists
     const projectTaskType = await prisma.projectTaskType.findUnique({
@@ -102,10 +102,10 @@ export async function DELETE(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ projectId: string; taskTypeId: string }> }
+  { params }: { params: { projectId: string; taskTypeId: string } }
 ) {
   try {
-    const { projectId, taskTypeId } = await params
+    const { projectId, taskTypeId } = params
     const body = await request.json()
     const { isActive } = body
 

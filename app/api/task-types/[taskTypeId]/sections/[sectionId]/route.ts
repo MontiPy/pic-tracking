@@ -9,10 +9,10 @@ import {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string; sectionId: string }> }
+  { params }: { params: { taskTypeId: string; sectionId: string } }
 ) {
   try {
-    const { taskTypeId, sectionId } = await params
+    const { taskTypeId, sectionId } = params
 
     const section = await prisma.taskTypeSection.findUnique({
       where: {
@@ -70,10 +70,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string; sectionId: string }> }
+  { params }: { params: { taskTypeId: string; sectionId: string } }
 ) {
   try {
-    const { taskTypeId, sectionId } = await params
+    const { taskTypeId, sectionId } = params
     const body = await request.json()
 
     // Validate input
@@ -153,10 +153,10 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ taskTypeId: string; sectionId: string }> }
+  { params }: { params: { taskTypeId: string; sectionId: string } }
 ) {
   try {
-    const { taskTypeId, sectionId } = await params
+    const { taskTypeId, sectionId } = params
 
     // Check if section exists and belongs to the task type
     const existingSection = await prisma.taskTypeSection.findUnique({
