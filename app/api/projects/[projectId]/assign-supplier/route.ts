@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 
 export async function POST(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { projectId: string } }
 ) {
   try {
     const body = await request.json()
@@ -15,7 +15,7 @@ export async function POST(
 
     // Verify project exists
     const project = await prisma.project.findUnique({
-      where: { id: params.id },
+      where: { id: params.projectId },
       include: {
         taskTemplates: {
           include: {
@@ -48,7 +48,7 @@ export async function POST(
       where: {
         supplierId_projectId: {
           supplierId,
-          projectId: params.id
+          projectId: params.projectId
         }
       }
     })
@@ -63,7 +63,7 @@ export async function POST(
       const supplierProject = await tx.supplierProject.create({
         data: {
           supplierId,
-          projectId: params.id,
+          projectId: params.projectId,
           status: 'active'
         }
       })
@@ -122,7 +122,7 @@ export async function POST(
       summary: {
         supplierId,
         supplierName: supplier.name,
-        projectId: params.id,
+        projectId: params.projectId,
         projectName: project.name,
         tasksCreated: result.createdCount,
         taskBreakdown: project.taskTemplates.reduce((acc, template) => {
@@ -141,7 +141,7 @@ export async function POST(
 // Remove supplier from project and cleanup task instances
 export async function DELETE(
   request: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: { projectId: string } }
 ) {
   try {
     const { searchParams } = new URL(request.url)
@@ -156,7 +156,7 @@ export async function DELETE(
       where: {
         supplierId_projectId: {
           supplierId,
-          projectId: params.id
+          projectId: params.projectId
         }
       },
       include: {
@@ -201,7 +201,7 @@ export async function DELETE(
       message: 'Supplier removed from project successfully',
       summary: {
         supplierId,
-        projectId: params.id,
+        projectId: params.projectId,
         tasksDeleted: result.deletedTaskCount,
         completedTasksLost: result.completedTasksLost
       }

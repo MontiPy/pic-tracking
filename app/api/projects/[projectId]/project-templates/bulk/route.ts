@@ -13,9 +13,9 @@ const BulkAttachSchema = z.object({
   })).min(1)
 })
 
-export async function POST(request: Request, { params }: { params: { id: string } }) {
+export async function POST(request: Request, { params }: { params: { projectId: string } }) {
   try {
-    const projectId = params.id
+    const projectId = params.projectId
     const json = await request.json()
     const parsed = BulkAttachSchema.safeParse(json)
     if (!parsed.success) {

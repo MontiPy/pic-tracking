@@ -11,12 +11,9 @@ import {
   Settings,
   Table,
   Kanban,
-  Timeline,
   Plus,
   Eye,
   Clock,
-  AlertTriangle,
-  Filter,
   Archive
 } from 'lucide-react'
 import { useAppStore, useCurrentSavedView } from '@/stores/useAppStore'
@@ -83,7 +80,7 @@ const secondaryNavigation = [
 const viewIcons = {
   table: Table,
   board: Kanban,
-  timeline: Timeline,
+  timeline: Clock,
 }
 
 export default function Sidebar({ onItemClick }: SidebarProps) {

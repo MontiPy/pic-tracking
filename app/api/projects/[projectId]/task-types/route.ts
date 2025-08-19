@@ -10,10 +10,10 @@ import { createSupplierTaskInstances } from '@/lib/due-date-propagation'
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const { id: projectId } = await params
+    const { projectId } = await params
 
     // Verify project exists
     const project = await prisma.project.findUnique({
@@ -97,10 +97,10 @@ export async function GET(
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ projectId: string }> }
 ) {
   try {
-    const { id: projectId } = await params
+    const { projectId } = await params
     const body = await request.json()
 
     // Add projectId to the body for validation

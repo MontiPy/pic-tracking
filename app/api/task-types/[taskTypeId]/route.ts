@@ -9,15 +9,15 @@ import {
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ taskTypeId: string }> }
 ) {
   try {
-    const { id } = await params
+    const { taskTypeId } = await params
     const { searchParams } = new URL(request.url)
     const includeSections = searchParams.get('includeSections') === 'true'
 
     const taskType = await prisma.taskType.findUnique({
-      where: { id },
+      where: { id: taskTypeId },
       include: includeSections ? {
         sections: {
           include: {
@@ -56,7 +56,7 @@ export async function GET(
 
     if (!taskType) {
       return NextResponse.json(
-        createNotFoundError('TaskType', id),
+        createNotFoundError('TaskType', taskTypeId),
         { status: 404 }
       )
     }
@@ -73,10 +73,10 @@ export async function GET(
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ taskTypeId: string }> }
 ) {
   try {
-    const { id } = await params
+    const { taskTypeId } = await params
     const body = await request.json()
 
     // Validate input
@@ -90,18 +90,18 @@ export async function PUT(
 
     // Check if task type exists
     const existingTaskType = await prisma.taskType.findUnique({
-      where: { id }
+      where: { id: taskTypeId }
     })
 
     if (!existingTaskType) {
       return NextResponse.json(
-        createNotFoundError('TaskType', id),
+        createNotFoundError('TaskType', taskTypeId),
         { status: 404 }
       )
     }
 
     const updatedTaskType = await prisma.taskType.update({
-      where: { id },
+      where: { id: taskTypeId },
       data: validationResult.data,
       include: {
         sections: {
@@ -157,14 +157,14 @@ export async function PUT(
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: Promise<{ taskTypeId: string }> }
 ) {
   try {
-    const { id } = await params
+    const { taskTypeId } = await params
 
     // Check if task type exists
     const existingTaskType = await prisma.taskType.findUnique({
-      where: { id },
+      where: { id: taskTypeId },
       include: {
         _count: {
           select: {
@@ -178,7 +178,7 @@ export async function DELETE(
 
     if (!existingTaskType) {
       return NextResponse.json(
-        createNotFoundError('TaskType', id),
+        createNotFoundError('TaskType', taskTypeId),
         { status: 404 }
       )
     }
@@ -193,12 +193,12 @@ export async function DELETE(
 
     // Delete the task type (cascading will handle sections and tasks)
     await prisma.taskType.delete({
-      where: { id }
+      where: { id: taskTypeId }
     })
 
     return NextResponse.json({ 
       message: 'Task type deleted successfully',
-      deletedId: id 
+      deletedId: taskTypeId
     })
   } catch (error) {
     console.error('Error deleting task type:', error)
