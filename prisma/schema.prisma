@@ -10,19 +10,31 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// Enhanced Supplier model with manufacturing details
 model Supplier {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  contactInfo String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String    @unique
+  supplierNumber String?   @unique  // Unique supplier identifier (optional for migration)
+  location       String?              // Facility/address location (optional for migration)
+  contacts       String?              // JSON string of contact objects (optional for migration)
+  contactInfo    String               // Keep for backward compatibility
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
   // Relationships
+  supplierProjectInstances SupplierProjectInstance[]
+  
+  // Old relationships (for migration compatibility)
   supplierProjects SupplierProject[]
 
+  // Indexes for performance
+  @@index([name]) // For search functionality
+  @@index([supplierNumber]) // For supplier number lookups
+  @@index([updatedAt]) // For recent activity queries
   @@map("suppliers")
 }
 
+// Project model remains similar but with new relationships
 model Project {
   id          String    @id @default(cuid())
   name        String    @unique
@@ -31,12 +43,176 @@ model Project {
   updatedAt   DateTime  @updatedAt
 
   // Relationships
+  supplierProjectInstances SupplierProjectInstance[]
+  projectMilestoneTasks    ProjectMilestoneTask[]
+  
+  // Old relationships (for migration compatibility)
   supplierProjects SupplierProject[]
   taskTemplates    TaskTemplate[]
 
+  // Indexes for performance
+  @@index([name]) // For project lookups
+  @@index([updatedAt]) // For recent activity
   @@map("projects")
 }
 
+// Enhanced TaskType model
+model TaskType {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  category    String    // "Part Approval", "Production Readiness", "New Model Builds", "General"
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  milestones Milestone[]
+  
+  // Old relationships (for migration compatibility)
+  taskTemplates TaskTemplate[]
+
+  // Indexes for performance
+  @@index([category]) // For filtering by category
+  @@index([name]) // For task type lookups
+  @@map("task_types")
+}
+
+// New Milestone model (PA2, PA3, PA4, etc.)
+model Milestone {
+  id          String    @id @default(cuid())
+  taskTypeId  String
+  code        String    // "PA2", "PA3", "PA4", "NMR1", etc.
+  name        String    // "First Article", "Production Trial", etc.
+  description String?
+  sequence    Int       // Order within task type
+  isRequired  Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  taskType              TaskType @relation(fields: [taskTypeId], references: [id], onDelete: Cascade)
+  tasks                 Task[]
+  projectMilestoneTasks ProjectMilestoneTask[]
+
+  // Indexes for performance
+  @@index([taskTypeId]) // For task type queries
+  @@index([code]) // For milestone code lookups
+  @@index([sequence]) // For ordering
+  @@unique([taskTypeId, code]) // Unique milestone code per task type
+  @@map("milestones")
+}
+
+// New Task model (Gage R&R Submission, Drawing Approval, etc.)
+model Task {
+  id          String    @id @default(cuid())
+  milestoneId String
+  name        String    // "Gage R&R Submission", "Drawing Approval", etc.
+  description String?
+  sequence    Int       // Order within milestone
+  isRequired  Boolean   @default(true)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  milestone             Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  projectMilestoneTasks ProjectMilestoneTask[]
+
+  // Indexes for performance
+  @@index([milestoneId]) // For milestone queries
+  @@index([name]) // For task name lookups
+  @@index([sequence]) // For ordering
+  @@unique([milestoneId, name]) // Unique task name per milestone
+  @@map("tasks")
+}
+
+// Project Template: Milestone-Task with Due Dates
+model ProjectMilestoneTask {
+  id          String    @id @default(cuid())
+  projectId   String
+  milestoneId String
+  taskId      String
+  dueDate     DateTime  // Set at project level for consistency
+  isActive    Boolean   @default(true)
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  project               Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  milestone             Milestone @relation(fields: [milestoneId], references: [id], onDelete: Cascade)
+  task                  Task @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  supplierTaskInstances SupplierTaskInstance[]
+
+  // Indexes for performance
+  @@index([projectId]) // For project queries
+  @@index([milestoneId]) // For milestone queries
+  @@index([taskId]) // For task queries
+  @@index([dueDate]) // For due date sorting
+  @@index([projectId, dueDate]) // Composite for project timeline views
+  @@unique([projectId, milestoneId, taskId]) // Unique task per project milestone
+  @@map("project_milestone_tasks")
+}
+
+// Supplier Project Instance (replaces SupplierProject)
+model SupplierProjectInstance {
+  id         String    @id @default(cuid())
+  supplierId String
+  projectId  String
+  status     String    @default("active")
+  assignedAt DateTime  @default(now())
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  // Relationships
+  supplier              Supplier @relation(fields: [supplierId], references: [id], onDelete: Cascade)
+  project               Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  supplierTaskInstances SupplierTaskInstance[]
+
+  // Indexes for performance
+  @@index([supplierId]) // For supplier-centric queries
+  @@index([projectId]) // For project-centric queries
+  @@index([status]) // For filtering by status
+  @@index([assignedAt]) // For chronological queries
+  @@unique([supplierId, projectId]) // One instance per supplier-project pair
+  @@map("supplier_project_instances")
+}
+
+// New Supplier Task Instance
+model SupplierTaskInstance {
+  id                        String    @id @default(cuid())
+  supplierProjectInstanceId String
+  projectMilestoneTaskId    String
+  status                    String    @default("not_started") // "not_started", "in_progress", "completed", "blocked", "cancelled"
+  dueDate                   DateTime  // Inherited from ProjectMilestoneTask
+  actualDueDate             DateTime? // Override capability
+  isApplied                 Boolean   @default(true) // Can un-apply specific tasks
+  completedAt               DateTime?
+  notes                     String?
+  submissionFiles           String?   // JSON string of file attachments
+  createdAt                 DateTime  @default(now())
+  updatedAt                 DateTime  @updatedAt
+
+  // Relationships
+  supplierProjectInstance SupplierProjectInstance @relation(fields: [supplierProjectInstanceId], references: [id], onDelete: Cascade)
+  projectMilestoneTask    ProjectMilestoneTask @relation(fields: [projectMilestoneTaskId], references: [id], onDelete: Cascade)
+
+  // Critical indexes for performance
+  @@index([status]) // For filtering by status
+  @@index([dueDate]) // For due date queries and overdue detection
+  @@index([actualDueDate]) // For overridden due dates
+  @@index([supplierProjectInstanceId]) // For supplier-specific task queries
+  @@index([projectMilestoneTaskId]) // For task template queries
+  @@index([isApplied]) // For applied/unapplied task filtering
+  @@index([status, dueDate]) // Composite for overdue task queries
+  @@index([supplierProjectInstanceId, status]) // Composite for supplier task status
+  @@index([supplierProjectInstanceId, isApplied]) // Composite for applied tasks
+  @@index([updatedAt]) // For recent activity tracking
+  @@index([completedAt]) // For completion date queries
+  @@unique([supplierProjectInstanceId, projectMilestoneTaskId]) // One instance per supplier-task
+  @@map("supplier_task_instances")
+}
+
+// Keep old models for migration compatibility (will be removed later)
 model SupplierProject {
   id         String    @id @default(cuid())
   supplierId String
@@ -50,21 +226,11 @@ model SupplierProject {
   taskInstances TaskInstance[]
 
   @@unique([supplierId, projectId])
-  @@map("supplier_projects")
-}
-
-model TaskType {
-  id          String    @id @default(cuid())
-  name        String    @unique
-  category    String    // "Part Approval", "Production Readiness", "New Model Builds", "General"
-  description String?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-
-  // Relationships
-  taskTemplates TaskTemplate[]
-
-  @@map("task_types")
+  @@index([supplierId])
+  @@index([projectId])
+  @@index([status])
+  @@index([assignedAt])
+  @@map("supplier_projects_old")
 }
 
 model TaskTemplate {
@@ -82,15 +248,19 @@ model TaskTemplate {
   taskInstances TaskInstance[]
 
   @@unique([taskTypeId, projectId])
-  @@map("task_templates")
+  @@index([projectId])
+  @@index([taskTypeId])
+  @@index([canonicalDue])
+  @@index([projectId, canonicalDue])
+  @@map("task_templates_old")
 }
 
 model TaskInstance {
   id                String    @id @default(cuid())
   supplierProjectId String
   taskTemplateId    String
-  status            String    @default("not_started") // "not_started", "in_progress", "completed", "blocked", "cancelled"
-  actualDue         DateTime? // Inherited from template, can be overridden
+  status            String    @default("not_started")
+  actualDue         DateTime?
   completedAt       DateTime?
   notes             String?
   createdAt         DateTime  @default(now())
@@ -101,5 +271,13 @@ model TaskInstance {
   taskTemplate    TaskTemplate    @relation(fields: [taskTemplateId], references: [id], onDelete: Cascade)
 
   @@unique([supplierProjectId, taskTemplateId])
-  @@map("task_instances")
+  @@index([status])
+  @@index([actualDue])
+  @@index([supplierProjectId])
+  @@index([taskTemplateId])
+  @@index([status, actualDue])
+  @@index([supplierProjectId, status])
+  @@index([updatedAt])
+  @@index([completedAt])
+  @@map("task_instances_old")
 }
